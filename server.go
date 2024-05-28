@@ -1,4 +1,4 @@
-package mediaserver
+package media
 
 import (
 	"log"
@@ -14,8 +14,7 @@ func ServeMux() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-			log.Println("Request received: ", r.URL.Path)
-			filePath := filepath.Join(mediaDir, r.URL.Path)
+			filePath := filepath.Join(mediaDir, "Episode 1_Weird.m4v")
 			log.Printf("Serving file: %s", filePath)
 			if _, err := os.Stat(filePath); os.IsNotExist(err) {
 					http.NotFound(w, r)
@@ -68,8 +67,8 @@ func ServeMux() {
 			}
 	})
 
-	log.Println("Listening on localhost:8080")
-	if err := http.ListenAndServe(":8080", mux); err != nil {
+	log.Println("Listening on localhost:6443")
+	if err := http.ListenAndServe(":6443", mux); err != nil {
 			log.Fatalf("Failed to start server: %s", err)
 	}
 }
