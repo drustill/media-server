@@ -1,5 +1,5 @@
-# Ignore media files
-media/*
-
-# Ignore markdown files other than README.md
+# Ignore ROADMAP.md
 *.md
+
+# dotfiles
+.env
