@@ -2,28 +2,34 @@ package config
 
 import (
 	"log"
-	"net/http"
+	"os"
+	"strings"
 )
 
 type Config struct {
 	ServerAddress string
-	Handler 		  func(w http.ResponseWriter, r *http.Request)
+	TargetAddresses []string
 }
 
-func load(addr string) *Config {
-	if addr == "" {
-			addr = ":8080"
+func load(src string, dsts []string) *Config {
+	if src == "" {
+			src = ":8080"
 	}
-	log.Printf("Loaded configuration: addr=%s", addr)
 	return &Config{
-			ServerAddress: addr,
+			ServerAddress: src,
+			TargetAddresses: dsts,
 	}
 }
 
 func LoadTargetConfig(addr string) *Config {
-	return load(addr)
+	return load(addr, []string{})
 }
 
 func LoadProxyConfig(addr string) *Config {
-	return load(addr)
+	targetDsts := strings.Split(os.Getenv("TARGET_ADDRS"), ",")
+	if len(targetDsts) == 0 {
+			log.Fatal("TARGET_ADDRS is not set or is empty")
+	}
+
+	return load(addr, targetDsts)
 }

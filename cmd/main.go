@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"proxy/internal/router"
+	"sync"
 
 	"github.com/joho/godotenv"
 )
@@ -12,16 +13,28 @@ func main() {
 		log.Fatalf("Error loading .env file: %v", err)
 	}
 
-	targetServer := router.NewTargetServer()
+	targetServers := router.NewTargetServers()
 	proxyServer := router.NewProxyServer()
+	var wg sync.WaitGroup
 
+	for _, s := range targetServers {
+		wg.Add(1)
+		go func(s *router.Server) {
+			defer wg.Done()
+			if err := s.Run(); err != nil {
+				log.Fatalf("Target Server exit: %v", err)
+			}
+		}(s)
+	}
+
+	wg.Add(1)
 	go func() {
-		if err := targetServer.Run(); err != nil {
-			log.Fatalf("Error starting target server: %v", err)
+		defer wg.Done()
+		if err := proxyServer.Run(); err != nil {
+			log.Fatalf("Proxy Server exit: %v", err)
 		}
 	}()
 
-	if err := proxyServer.Run(); err != nil {
-		log.Fatalf("Error starting proxy server: %v", err)
-	}
+	wg.Wait()
+	log.Printf("Servers exited..")
 }
