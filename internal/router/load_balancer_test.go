@@ -57,7 +57,8 @@ func TestLeastActiveBalancer(t *testing.T) {
 		inputServers := []string{"localhost:9090", "localhost:9091"}
 		lb := NewLeastConnectionBalancer(inputServers)
 		
-		s := lb.SelectTarget() // Select first server
+		var s string
+		s = lb.SelectTarget() // Select first server
 		lb.RecordRequest() // Increment active connections
 		s = lb.SelectTarget() // Shift to next server
 		lb.RecordRequest() // Increment active connections
